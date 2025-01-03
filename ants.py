@@ -1,4 +1,5 @@
 import time
+import random
 
 f = open("map.txt", "r")
 
@@ -6,26 +7,91 @@ maze = []
 for i in range(10):
     maze.append(f.readline())
     maze[i] = maze[i].replace("\n", "")
+    maze[i] = maze[i].replace("X", chr(38))  # Finish
     maze[i] = maze[i].replace("F", chr(35)) # Finish
     maze[i] = maze[i].replace("S", chr(36)) # Start
 
-maze2 = []
+maze_matrix = []
 for i in range(10):
-    maze2.append([' ' for x in range(10)])
+    maze_matrix.append([' ' for x in range(10)])
     for j in range(10):
-        maze2[i][j] = maze[i][j]
+        maze_matrix[i][j] = maze[i][j]
 
-print(maze2)
+# print(maze2)
 for i in range(10):
-    print("".join(maze2[i]))
+    print("".join(maze_matrix[i]))
 
-start_pos = [0,4]
-finish_pos = [9,7]
+start_pos = [0,0]
+finish_pos = [0,0]
+
+for i in range(len(maze_matrix)):
+    for j in range(len(maze_matrix[0])):
+        if maze_matrix[i][j] == chr(36):
+            start_pos = [i,j]
+        if maze_matrix[i][j] == chr(35):
+            finish_pos = [i,j]
+
+print(f"Start: {start_pos}")
+print(f"Finish: {finish_pos}")
+
 n_ants = 1
 path = 0
+ants_pos = [start_pos.copy() for ant in range(n_ants)]
 
-# maze[start_pos[0]][start_pos[1]] = 'F'
-print(maze[0][1])
+for i in range(5):
+    for j in range(n_ants):
+        last_pos = ants_pos[j]
+        while ants_pos[j] != finish_pos:
+            paths = [0, 0, 0, 0]  # 0 - filled, 1 - free # left, up, right, down
+            # up
+            try:
+                if maze[ants_pos[j][0]-1][ants_pos[j][1]] != '&':
+                    if maze[ants_pos[j][0]-1][ants_pos[j][1]] == ' ':
+                        paths[1] = 1
+                    else:
+                        paths[1] = ord(maze[ants_pos[j][0]-1][ants_pos[j][1]])-47
+            except IndexError: print()
+            # down
+            try:
+                if maze[ants_pos[j][0]+1][ants_pos[j][1]] != '&':
+                    if maze[ants_pos[j][0]+1][ants_pos[j][1]] == ' ':
+                        paths[3] = 1
+                    else:
+                        paths[3] = ord(maze[ants_pos[j][0]+1][ants_pos[j][1]])-47
+            except IndexError: print()
+            # left
+            try:
+                if maze[ants_pos[j][0]][ants_pos[j][1]-1] != '&':
+                    if maze[ants_pos[j][0]][ants_pos[j][1]-1] == ' ':
+                        paths[0] = 1
+                    else:
+                        paths[0] = ord(maze[ants_pos[j][0]][ants_pos[j][1]-1])-47
+            except IndexError: print()
+            # right
+            try:
+                if maze[ants_pos[j][0]][ants_pos[j][1]+1] != '&':
+                    if maze[ants_pos[j][0]][ants_pos[j][1]+1] == ' ':
+                        paths[2] = 1
+                    else:
+                        paths[2] = ord(maze[ants_pos[j][0]][ants_pos[j][1]+1])-47
+            except IndexError: print()
+            paths = [float(i) / sum(paths) for i in paths]
+            print("Paths: ",  paths)
+            probs = [paths[0], sum(paths[0:2]), sum(paths[0:3]), 1]
+            print("Probs: ", probs)
+            dice = random.random()
+            print("Dice: ", dice)
+            choice = 0
+            if dice< probs[0]:
+                choice = 0 # left
+            if dice>probs[0] and dice<probs[1]:
+                choice = 1 # up
+            if dice>probs[1] and dice<probs[2]:
+                choice = 2 # right
+            if dice>probs[2]:
+                choice = 3 # down
+            print("Choice: ", choice)
+
 #
 # while path == 0:
 #     for i in range(10):
