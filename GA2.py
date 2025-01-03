@@ -2,7 +2,7 @@ import time
 import numpy
 
 def solver(cesta):
-    f = open("B1.txt", "r")
+    f = open("map.txt", "r")
 
     bludisko=[]
 
