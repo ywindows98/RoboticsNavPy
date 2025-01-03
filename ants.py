@@ -41,39 +41,67 @@ ants_pos = [start_pos.copy() for ant in range(n_ants)]
 for i in range(5):
     for j in range(n_ants):
         last_pos = ants_pos[j]
+        # for k in range(10):
         while ants_pos[j] != finish_pos:
             paths = [0, 0, 0, 0]  # 0 - filled, 1 - free # left, up, right, down
             # up
             try:
-                if maze[ants_pos[j][0]-1][ants_pos[j][1]] != '&':
-                    if maze[ants_pos[j][0]-1][ants_pos[j][1]] == ' ':
+                active_char = maze_matrix[ants_pos[j][0]-1][ants_pos[j][1]]
+                print(active_char)
+                if active_char != '&':
+                    if active_char == '$':
+                        paths[1] = 0.1
+                    elif active_char == ' ':
                         paths[1] = 1
                     else:
-                        paths[1] = ord(maze[ants_pos[j][0]-1][ants_pos[j][1]])-47
+                        if ants_pos[j][0]-1 == last_pos[0] and ants_pos[j][1] == last_pos[1]:
+                            paths[1] = (ord(active_char)-47) / 10
+                        else:
+                            paths[1] = ord(active_char) - 47
             except IndexError: print()
             # down
             try:
-                if maze[ants_pos[j][0]+1][ants_pos[j][1]] != '&':
-                    if maze[ants_pos[j][0]+1][ants_pos[j][1]] == ' ':
+                active_char = maze_matrix[ants_pos[j][0]+1][ants_pos[j][1]]
+                if active_char != '&':
+                    if active_char == '$':
+                        paths[3] = 0.1
+                    elif active_char == ' ':
                         paths[3] = 1
                     else:
-                        paths[3] = ord(maze[ants_pos[j][0]+1][ants_pos[j][1]])-47
+                        if ants_pos[j][0]+1 == last_pos[0] and ants_pos[j][1] == last_pos[1]:
+                            paths[3] = (ord(active_char)-47) / 10
+                        else:
+                            paths[3] = ord(active_char) - 47
             except IndexError: print()
             # left
             try:
-                if maze[ants_pos[j][0]][ants_pos[j][1]-1] != '&':
-                    if maze[ants_pos[j][0]][ants_pos[j][1]-1] == ' ':
+                active_char = maze_matrix[ants_pos[j][0]][ants_pos[j][1]-1]
+                if active_char != '&':
+                    if active_char == '$':
+                        paths[0] = 0.1
+                    elif active_char == ' ':
                         paths[0] = 1
                     else:
-                        paths[0] = ord(maze[ants_pos[j][0]][ants_pos[j][1]-1])-47
+                        if ants_pos[j][0] == last_pos[0] and ants_pos[j][1]-1 == last_pos[1]:
+                            paths[0] = (ord(active_char)-47) / 10
+                        else:
+                            paths[0] = ord(active_char)-47
+
             except IndexError: print()
             # right
             try:
-                if maze[ants_pos[j][0]][ants_pos[j][1]+1] != '&':
-                    if maze[ants_pos[j][0]][ants_pos[j][1]+1] == ' ':
+                active_char = maze_matrix[ants_pos[j][0]][ants_pos[j][1]+1]
+                if active_char != '&':
+                    if active_char == '$':
+                        paths[2] = 0.1
+                    elif active_char == ' ':
                         paths[2] = 1
                     else:
-                        paths[2] = ord(maze[ants_pos[j][0]][ants_pos[j][1]+1])-47
+                        if ants_pos[j][0] == last_pos[0] and ants_pos[j][1]+1 == last_pos[1]:
+                            paths[2] = (ord(active_char)-47) / 10
+                        else:
+                            paths[2] = ord(active_char)-47
+
             except IndexError: print()
             paths = [float(i) / sum(paths) for i in paths]
             print("Paths: ",  paths)
@@ -83,14 +111,26 @@ for i in range(5):
             print("Dice: ", dice)
             choice = 0
             if dice< probs[0]:
-                choice = 0 # left
+                choice = [0, -1] # left
             if dice>probs[0] and dice<probs[1]:
-                choice = 1 # up
+                choice = [-1, 0] # up
             if dice>probs[1] and dice<probs[2]:
-                choice = 2 # right
+                choice = [0, 1] # right
             if dice>probs[2]:
-                choice = 3 # down
-            print("Choice: ", choice)
+                choice = [1, 0] # down
+            # print("Choice: ", choice)
+
+            active_char = maze_matrix[ants_pos[j][0]][ants_pos[j][1]]
+            if active_char != '$':
+                if active_char == ' ':
+                    maze_matrix[ants_pos[j][0]][ants_pos[j][1]] = '1'
+                else:
+                    maze_matrix[ants_pos[j][0]][ants_pos[j][1]] = chr(ord(maze_matrix[ants_pos[j][0]][ants_pos[j][1]])+1)
+            last_pos = ants_pos[j].copy()
+            ants_pos[j] = [ants_pos[j][0] + choice[0], ants_pos[j][1] + choice[1]]
+            print(ants_pos[j])
+            for i in range(10):
+                print("".join(maze_matrix[i]))
 
 #
 # while path == 0:
